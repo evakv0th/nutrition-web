@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 import Recipes from "./components/Recipes";
@@ -8,14 +8,14 @@ import Nav from "./components/Nav";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Nav />
-      <Routes>
-        <Route exact path="/" component={Home} />
-        <Route path="/recipes" component={Recipes} />
-        <Route path="/nutrition" component={Nutrition} />
-      </Routes>
-    </BrowserRouter>
+    <Router>
+    <Nav />
+    <Routes>
+      <Route path='/' element={<Home />} />
+      <Route path="/recipes" element={<Recipes />} />
+      <Route path="/nutrition" element={<Nutrition />} />
+    </Routes>
+  </Router>
   );
 }
 

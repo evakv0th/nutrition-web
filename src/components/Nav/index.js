@@ -1,9 +1,16 @@
 import React from 'react'
+import { Link } from "react-router-dom";
+
 
 function Nav() {
   return (
-    <div>Nav
-</div>
+    <>
+      <ul>
+      <Link className='nav' to ='/'><li>Homepage</li></Link>
+        <Link className='nav' to ='/recipes'><li>Recipes</li></Link>
+        <Link className='nav' to ='/nutrition'><li>Nutrition</li></Link>
+      </ul>
+    </>
   )
 }
 
