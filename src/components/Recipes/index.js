@@ -3,6 +3,8 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 
 function Recipes() {
+  const API_KEY = '6c31a1ea041d9a7efb9526c6aaf38337';
+  const API_ID = '08f1c7d8';
   const [recipes, setRecipes] = useState([]);
   const [searchVal, setSearchVal] = useState(
     localStorage.getItem("searchVal") || "pizza"
@@ -13,6 +15,8 @@ function Recipes() {
   const [mealType, setMealType] = useState("");
   const [dishType, setDishType] = useState("");
   const [debouncedValue, setDebouncedValue] = useState(searchVal);
+  const [nextPage, setNextPage] = useState('');
+  const [reset, setReset] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -25,17 +29,27 @@ function Recipes() {
   }, [searchVal]);
 
   useEffect(() => {
+
     axios
       .get(
-        `https://api.edamam.com/api/recipes/v2?type=public&q=${debouncedValue}&app_id=08f1c7d8&app_key=6c31a1ea041d9a7efb9526c6aaf38337${diet}${health}${cuisineType}${mealType}${dishType}`
+        `https://api.edamam.com/api/recipes/v2?type=public&q=${debouncedValue}&app_id=${API_ID}&app_key=${API_KEY}${diet}${health}${cuisineType}${mealType}${dishType}`
       )
       .then((response) => {
         setRecipes(response.data.hits);
+        setNextPage(response.data._links.next.href)
       })
       .catch((error) => {
         console.log(error);
       });
-  }, [debouncedValue, diet, health, cuisineType, mealType, dishType]);
+  }, [
+    debouncedValue,
+    diet,
+    health,
+    cuisineType,
+    mealType,
+    dishType,
+    reset,
+  ]);
 
   const searchItems = (searchItem) => {
     setSearchVal(searchItem);
@@ -57,6 +71,23 @@ function Recipes() {
   const handleDishTypeChange = (event) => {
     setDishType(event.target.value);
   };
+
+  const handleNextPage = () => {
+    axios
+      .get(nextPage)
+      .then((response) => {
+        setRecipes(response.data.hits);
+        console.log(nextPage)
+        setNextPage(response.data._links.next.href);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  const resetPages = () => {
+    setReset(!reset)
+  }
 
   return (
     <div>
@@ -159,10 +190,16 @@ function Recipes() {
       <h2>Filter by dish type:</h2>
       <select name="select" onChange={handleDishTypeChange}>
         <option selected="" value=""></option>
-        <option value="&dishType=Biscuits%20and%20cookies"> Biscuits and cookies </option>
+        <option value="&dishType=Biscuits%20and%20cookies">
+          {" "}
+          Biscuits and cookies{" "}
+        </option>
         <option value="&dishType=Bread"> Bread </option>
         <option value="&dishType=Cereals"> Cereals </option>
-        <option value="&dishType=Condiments%20and%20sauces"> Condiments and sauces </option>
+        <option value="&dishType=Condiments%20and%20sauces">
+          {" "}
+          Condiments and sauces{" "}
+        </option>
         <option value="&dishType=Desserts"> Desserts </option>
         <option value="&dishType=Drinks"> Drinks </option>
         <option value="&dishType=Main%20course"> Main course </option>
@@ -184,6 +221,8 @@ function Recipes() {
           <li key={recipe.recipe.uri}>{recipe.recipe.label}</li>
         ))}
       </ul>
+        <button onClick={handleNextPage}>Next page</button>
+        <button onClick={resetPages}>Reset Pages</button>
     </div>
   );
 }
